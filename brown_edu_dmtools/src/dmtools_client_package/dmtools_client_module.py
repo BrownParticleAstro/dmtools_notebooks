@@ -107,7 +107,8 @@ class DMToolsClient():
     def update_current(self, data_in,url_in):
         if url_in == '':
             encoded_data = data_in.encode('utf-8')
-            update_request = urllib.request.Request(self.current_url, data=encoded_data, method='PATCH')
+            update_url = self.api_server + self.data_api + "update_a_data/?id_in=" + str(1)
+            update_request = urllib.request.Request(update_url, data=encoded_data, method='PATCH')
             update_request.add_header('dmtool-userid', str(self.dmtool_userid))
             update_request.add_header('dmtool-apikey', self.dmtool_apikey)
             #update_request.add_header('Content-Type', 'application/x-www-form-urlencoded')
