@@ -295,7 +295,7 @@ class DMToolsClient():
         '''
 
 class Plot():
-    def __init__():
+    def __init__(self):
         self.fig_chart_empty = go.Figure(data=[go.Scatter(x=[], y=[])])
         self.make_blank_chart('plot',0,0)
         
