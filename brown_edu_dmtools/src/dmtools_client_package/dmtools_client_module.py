@@ -104,132 +104,151 @@ class DMToolsClient():
             else:
                 raise
     
-    def update_current(self,data_in,url_in):
+    def update_current(self, data_in,url_in):
         if url_in == '':
-            encoded_data = urllib.parse.urlencode(data_in).encode('utf-8')
-            create_request = urllib.request.Request(self.current_url, data=encoded_data, method='PATCH')
-            create_request.add_header('dmtool-userid', str(self.dmtool_userid))
-            create_request.add_header('dmtool-apikey', self.dmtool_apikey)
-            create_request.add_header('Content-Type', 'application/x-www-form-urlencoded')
+            encoded_data = data_in.encode('utf-8')
+            update_request = urllib.request.Request(self.current_url, data=encoded_data, method='PATCH')
+            update_request.add_header('dmtool-userid', str(self.dmtool_userid))
+            update_request.add_header('dmtool-apikey', self.dmtool_apikey)
+            #update_request.add_header('Content-Type', 'application/x-www-form-urlencoded')
+            update_request.add_header('Content-Type', 'application/json')
         else:
-            encoded_data = urllib.parse.urlencode(data_in).encode('utf-8')
-            create_request = urllib.request.Request(url_in, data=encoded_data, method='POST')
-            create_request.add_header('dmtool-userid', str(self.dmtool_userid))
-            create_request.add_header('dmtool-apikey', self.dmtool_apikey)
-            create_request.add_header('Content-Type', 'application/x-www-form-urlencoded')
+            encoded_data = data_in.encode('utf-8')
+            update_request = urllib.request.Request(self, url_in, data=encoded_data, method='PATCH')
+            update_request.add_header('dmtool-userid', str(self.dmtools_userid))
+            update_request.add_header('dmtool-apikey', self.dmtools_apikey)
+            update_request.add_header('Content-Type', 'application/json')
+            #create_request.add_header('Content-Type', 'application/x-www-form-urlencoded')
         
         try:
-            with urllib.request.urlopen(create_request, context=self.context) as response:
+            with urllib.request.urlopen(update_request, context=context) as response:
                 response_data = response.read().decode('utf-8')
                 response_json_obj = json.loads(response_data)
                 return response_json_obj
         except urllib.error.HTTPError as e:
             if e.code == 307:
                 redirect_url = e.headers['Location']
-                return self.create_current(data_in, redirect_url)
+                return self.update_current(data_in, redirect_url)
+            elif e.code == 422:
+                print("HTTP 422 Unprocessable Entity")
+                error_response = e.read().decode('utf-8')
+                print("Response content:", error_response)
             else:
-                raise
+                print(f"Error: {e.code}")
+                error_response = e.read().decode('utf-8')
+                print("Response content:", error_response)
     
     def delete_current(self,data_in,url_in):
         if url_in == '':
             encoded_data = urllib.parse.urlencode(data_in).encode('utf-8')
-            create_request = urllib.request.Request(self.current_url, data=encoded_data, method='DELETE')
-            create_request.add_header('dmtool-userid', str(self.dmtool_userid))
-            create_request.add_header('dmtool-apikey', self.dmtool_apikey)
-            create_request.add_header('Content-Type', 'application/x-www-form-urlencoded')
+            delete_request = urllib.request.Request(self.current_url, data=encoded_data, method='DELETE')
+            delete_request.add_header('dmtool-userid', str(self.dmtool_userid))
+            delete_request.add_header('dmtool-apikey', self.dmtool_apikey)
+            delete_request.add_header('Content-Type', 'application/x-www-form-urlencoded')
         else:
             encoded_data = urllib.parse.urlencode(data_in).encode('utf-8')
-            create_request = urllib.request.Request(url_in, data=encoded_data, method='POST')
-            create_request.add_header('dmtool-userid', str(self.dmtool_userid))
-            create_request.add_header('dmtool-apikey', self.dmtool_apikey)
-            create_request.add_header('Content-Type', 'application/x-www-form-urlencoded')
+            delete_request = urllib.request.Request(url_in, data=encoded_data, method='POST')
+            delete_request.add_header('dmtool-userid', str(self.dmtool_userid))
+            delete_request.add_header('dmtool-apikey', self.dmtool_apikey)
+            delete_request.add_header('Content-Type', 'application/x-www-form-urlencoded')
         
         try:
-            with urllib.request.urlopen(create_request, context=self.context) as response:
+            with urllib.request.urlopen(delete_request, context=self.context) as response:
                 response_data = response.read().decode('utf-8')
                 response_json_obj = json.loads(response_data)
                 return response_json_obj
         except urllib.error.HTTPError as e:
             if e.code == 307:
                 redirect_url = e.headers['Location']
-                return self.create_current(data_in, redirect_url)
+                return self.update_current(data_in, redirect_url)
+            elif e.code == 422:
+                print("HTTP 422 Unprocessable Entity")
+                error_response = e.read().decode('utf-8')
+                print("Response content:", error_response)
             else:
-                raise
+                print(f"Error: {e.code}")
+                error_response = e.read().decode('utf-8')
+                print("Response content:", error_response)
 
     def clean_data_values(self, data_id_in):
-        _current_url = self.api_server + self.data_api + "read_a_data/?id_in=" + str(data_id_in)
-        request = Request(_current_url, headers=self.request_header)
+        fastapi_url_data = self.api_server + self.data_api + "read_a_data/?id_in=" + str(data_id_in)
+        request = Request(fastapi_url_data, headers=self.request_header)
         r = urllib.request.urlopen(request, context=self.context)
         string = r.read().decode('utf-8')
         a_data_json_obj = json.loads(string)
         data_string = a_data_json_obj['data_values']
+        #all_plots_json_obj[1]
+        #a_data_df = pd.DataFrame(a_data_json_obj, index=[0])
         data_string = data_string.replace("{[", "")
         data_string = data_string.replace("]}", "")
         #print(data_string)
         data_series = data_string.split("]")
         len(data_series)
-        lol = "trace_id,x,y|"
+        lol = []
         for l in range(0,len(data_series)):
-          series_id = 0
-          trace_id = l + 1
-          single_set = data_series[l]
-          set_list = single_set.split(";")
-          for i in set_list:
-              ## the following was added due to a different approach to data_string format
-              r0 = i.replace(',[','')
-              r1 = r0.replace('  ',' ')
-              r2 = r1.replace('  ',' ')
-              r3 = r2.replace('  ',' ')
-              r4 = r3.replace('\r\n','')
-              r5 = r4.replace('\t',' ')
-              r6 = r5.replace(',',' ')
-              r7 = r6.replace('  ',' ')
-              r8 = r7.replace('  ',' ')
-              r9 = r8.replace('\n',' ')
-              r10 = r9.replace("', '"," ")
-              r11 = r10.replace("['[",'')
-              r12 = r11.replace(']','')
-              r13 = r12.replace('[','')
-              r14 = r13.replace(',','')
-              s = r14.lstrip()
-              z = s.split(" ");
-              try:
-                  raw_y = z[1]
-                  raw_x = z[0].replace(",[", "")
-                  #print('print split z >>>>', z)
-              except:
-                  #print(z)
-                  raw_y = '0'
-                  raw_x = '0'
-    
-              try:
-                  x = float(raw_x)
-                  y = float(raw_y)
-                  masses =  float(raw_x)
-                  cross_sections = float(raw_y)
-                  formatted_x = "{:.5e}".format(x)
-                  formatted_y = "{:.5e}".format(y)
-                  append_this = str(trace_id) + "," + formatted_x + "," + formatted_y
-                  lol = lol + append_this
-              except:
-                  print('rejected z >> ', z)
-              lol = lol + '|'
-        #print(lol)
-        # Data payload
-        json_payload = {
-            "data": lol
+            series_lol = []
+            series_id = 0
+            trace_id = l + 1
+            single_set = data_series[l]
+            set_list = single_set.split(";")
+            for i in set_list:
+                ## the following was added due to a different approach to data_string format
+                r0 = i.replace(',[','')
+                r1 = r0.replace('  ',' ')
+                r2 = r1.replace('  ',' ')
+                r3 = r2.replace('  ',' ')
+                r4 = r3.replace('\r\n','')
+                r5 = r4.replace('\t',' ')
+                r6 = r5.replace(',',' ')
+                r7 = r6.replace('  ',' ')
+                r8 = r7.replace('  ',' ')
+                r9 = r8.replace('\n',' ')
+                r10 = r9.replace("', '"," ")
+                r11 = r10.replace("['[",'')
+                r12 = r11.replace(']','')
+                r13 = r12.replace('[','')
+                r14 = r13.replace(',','')
+                s = r14.lstrip()
+                z = s.split(" ");
+                try:
+                    raw_y = z[1]
+                    raw_x = z[0].replace(",[", "")
+                    #print('print split z >>>>', z)
+                except:
+                    #print(z)
+                    raw_y = '0'
+                    raw_x = '0'
+                
+                try:
+                    x = float(raw_x)
+                    y = float(raw_y)
+                    masses =  float(raw_x)
+                    cross_sections = float(raw_y)
+                    formatted_x = "{:.5e}".format(x)
+                    formatted_y = "{:.5e}".format(y)
+                    #append_this = str(trace_id) + "," + formatted_x + "," + formatted_y
+                    #append_this = '['+formatted_x+','+formatted_y+'],'
+                    append_this = [formatted_x, formatted_y]
+                    series_lol = series_lol + [append_this]
+                except:
+                    print('rejected z >> ', z)
+            lol = lol + [series_lol]
+            
+
+        # Convert the nested data to a JSON string
+
+        nested_data_string = json.dumps(lol)
+        
+        # Construct the payload with the nested JSON string
+        payload = {
+            "data": nested_data_string
         }
+        
+        json_data = json.dumps(payload)
+        #print(json_data)
+        r = self.update_current(json_data,'')
+        #print(r)
     
-        # Convert payload to JSON string
-        json_payload = json.dumps(json_payload)
-        bytes_payload = json_payload.encode('utf-8')
-        # update the field call data
-        _update_url = self.api_server + self.data_api + "update_a_data/?id_in=" + str(data_id_in)
-        request = Request(_update_url, data=bytes_payload, headers=self.request_header,  method='PATCH')
-        r = urllib.request.urlopen(request, context=self.context)
-        string = r.read().decode('utf-8')
-        update_a_data_json_obj = json.loads(string)
-        return update_a_data_json_obj
     '''
     def get_data_for_plot(self, plot_id_in):
         data_display_df = get_data_displays_for_plot(plot_id_in)
