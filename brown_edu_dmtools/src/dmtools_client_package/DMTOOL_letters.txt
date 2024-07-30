@@ -1,0 +1,367 @@
+class DataExamples():
+    def __init__(self):
+        self.d_xy = pd.DataFrame()
+        self.m_xy = pd.DataFrame()
+        self.t_xy = pd.DataFrame()
+        self.o_xy = pd.DataFrame()
+        self.l_xy = pd.DataFrame()
+        
+        
+        self.data_json = {
+          "subject": "data",
+          "old_limit_id": -1,
+          "spin_dependency": "SI",
+          "result_type": "Result Type",
+          "measurement_type": "Measurement Type",
+          "nomhash": "nomhash",
+          "x_units": "x units",
+          "y_units": "y units",
+          "x_rescale": "b",
+          "y_rescale": "b",
+          "default_color": "red",
+          "default_style": "solid",
+          "data_values": "{[1 1; 1 0]}",
+          "data_label": "Data Label",
+          "file_name": "Filename",
+          "data_comment": "Data Comment",
+          "data_reference": "Data Reference",
+          "archived_at": "1980-01-01T00:00:00",
+          "creator_id": -1,
+          "experiment": "Experiment A",
+          "rating": -1,
+          "public": 0,
+          "open": 0,
+          "official": 0,
+          "greatest_hit": 0,
+          "year": 2024
+        }
+        self.mstring = StringIO("""x,y
+          70,50
+          90,100
+          90,0
+          70,0
+          70,50
+          60,25
+          50,0
+          30,50
+          30,0
+          10,0
+          10,100
+          30,100
+          60,25
+        """)
+
+        self.mdf = pd.read_csv(self.mstring, sep=",")
+        
+        self.ostring = StringIO("""x,y
+          50,0
+          65,5
+          80,15
+          87,30
+          90,50
+          87,70
+          80,90
+          65,97
+          50,100
+          60,85
+          65,70
+          67,65
+          70,50
+          67,35
+          65,25
+          60,12
+          50,0
+          """)
+
+        self.ReadLetterO()
+
+        self.tstring = StringIO("""x,y
+          10,80
+          10,100
+          90,100
+          90,80
+          60,80
+          60,0
+          40,0
+          40,80
+          10,80
+          """)
+
+        self.tdf = pd.read_csv(self.tstring, sep=",")
+
+        self.lstring = StringIO("""x,y
+          10,0
+          100,0
+          100,20
+          30,20
+          30,100
+          10,100
+          10,0
+          """)
+
+        self.ldf = pd.read_csv(self.lstring, sep=",")
+
+        self.dstring = StringIO("""x,y
+          30,0
+          65,5
+          90,25
+          100,50
+          90,75
+          65,95
+          30,100
+          60,85
+          75,75
+          80,50
+          75,35
+          60,15
+          30,0
+          10,0
+          10,100
+          30,100
+          30,0
+          """)
+
+        self.ddf = pd.read_csv(self.dstring, sep=",")
+
+        self.MakeLetterExperiments()
+
+    #################################
+    def ReadLetterO(self):
+
+        odf_stage = pd.read_csv(self.ostring, sep=",")
+
+        odf_out = odf_stage.copy()
+
+        def reflectx(x_in):
+            return 50 - (x_in-50)
+
+        odf_out['x'] = odf_out['x'].apply(reflectx)
+
+        #odf_out['x'] = 50 - (odf_out['x']-50)
+
+        #odf_out = odf_out.assign(x=50)
+
+        odf_out = pd.concat([odf_out, odf_stage],ignore_index=True)
+        odf_out['row_id'] = odf_out.index
+        self.odf = odf_out
+
+
+    def MakeDMTool(self,data_id_in,trace_id_in):
+
+        def add100(x_in):
+            return (x_in + 100)
+
+        #"D"
+
+        dmtool_out = self.ddf.copy()
+
+        dmtool_out['data_id'] = data_id_in
+        dmtool_out['trace_id'] = trace_id_in
+        dmtool_out['trace_name'] = 'd'
+
+        #"M"
+        df_working = self.mdf.copy()
+        df_working['data_id'] = data_id_in
+        df_working['trace_id'] = trace_id_in + 1
+        df_working['trace_name'] = 'm'
+
+
+        df_working['x'] = df_working['x'].apply(add100)
+
+        dmtool_out = pd.concat([dmtool_out, df_working], ignore_index=True)
+
+        #"T"
+
+        df_working = self.tdf.copy()
+        df_working['data_id'] = data_id_in
+        df_working['trace_id'] = trace_id_in + 2
+        df_working['trace_name'] = 't'
+
+        df_working['x'] = df_working['x'].apply(add100)
+        df_working['x'] = df_working['x'].apply(add100)
+
+        dmtool_out = pd.concat([dmtool_out, df_working], ignore_index=True)
+
+        #"O1 & O2"
+
+        df_working = self.odf.copy()
+        df_working['data_id'] = data_id_in
+        df_working['trace_id'] = trace_id_in + 3
+        df_working['trace_name'] = 'o1'
+
+        df_working['x'] = df_working['x'].apply(add100)
+        df_working['x'] = df_working['x'].apply(add100)
+        df_working['x'] = df_working['x'].apply(add100)
+
+        dmtool_out = pd.concat([dmtool_out, df_working], ignore_index=True)
+
+        df_working['data_id'] = data_id_in
+        df_working['trace_id'] = trace_id_in + 4
+        df_working['trace_name'] = 'o2'
+        df_working['x'] = df_working['x'].apply(add100)
+
+        dmtool_out = pd.concat([dmtool_out, df_working], ignore_index=True)
+
+        #"L"
+
+        df_working = self.ldf.copy()
+        df_working['data_id'] = data_id_in
+        df_working['trace_id'] = trace_id_in + 5
+        df_working['trace_name'] = 'l'
+
+        df_working['x'] = df_working['x'].apply(add100)
+        df_working['x'] = df_working['x'].apply(add100)
+        df_working['x'] = df_working['x'].apply(add100)
+        df_working['x'] = df_working['x'].apply(add100)
+        df_working['x'] = df_working['x'].apply(add100)
+
+        dmtool_out = pd.concat([dmtool_out, df_working], ignore_index=True)
+
+        ## out
+
+        #self.dmtdf = dmtool_out[['limit_id','trace_id','trace_name','x','y']]
+
+        dmtool_out['row_id'] = dmtool_out.index
+
+        self.dmtdf = dmtool_out
+
+    def MakeLetterExperiments(self):
+        
+        ## d
+        self.d_xy = self.ddf.copy()
+        self.d_xy['data_label'] = 'd'
+        self.d_xy['trace_name'] = 'd'
+        self.d_xy['trace_id'] = 1
+        self.d_xy['data_id'] = 1002
+        self.d_xy['row_id'] = self.d_xy.index
+        
+        ## m
+        self.m_xy = self.mdf.copy()
+        self.m_xy['data_label'] = 'm'
+        self.m_xy['trace_name'] = 'm'
+        self.m_xy['trace_id'] = 1
+        self.m_xy['data_id'] = 1003
+        self.m_xy['row_id'] = self.m_xy.index
+
+        ## t
+        self.t_xy = self.tdf.copy()
+        self.t_xy['data_label'] = 't'
+        self.t_xy['trace_name'] = 't'
+        self.t_xy['trace_id'] = 1
+        self.t_xy['data_id'] = 1004
+        self.t_xy['row_id'] = self.t_xy.index
+        
+        ## o
+        self.o_xy = self.odf.copy()
+        self.o_xy['data_label'] = 'o'
+        self.o_xy['trace_name'] = 'o'
+        self.o_xy['trace_id'] = 1
+        self.o_xy['data_id'] = 1005
+        self.o_xy['row_id'] = self.o_xy.index
+        
+        ## l
+        self.l_xy = self.ldf.copy()
+        self.l_xy['data_label'] = 'l'
+        self.l_xy['trace_name'] = 'l'
+        self.l_xy['trace_id'] = 1
+        self.l_xy['data_id'] = 1006
+        self.l_xy['row_id'] = self.l_xy.index
+
+    def create_letter_color(letter_in):
+        color_out = 'blue'
+        if letter_in == 'd':
+            color_out = 'red'
+        elif letter_in == 'm':
+            color_out = 'orange'
+        elif letter_in == 't':
+            color_out = 'yellow'
+        elif letter_in == 'o1':
+            color_out = 'green'
+        elif letter_in == 'o2':
+            color_out = 'blue'
+        elif letter_in == 'l':
+            color_out = 'indigo'
+        return color_out
+
+    def create_trace_color(number_in):
+        color_out = 'blue'
+        if number_in == 1:
+            color_out = 'red'
+        elif number_in == 2:
+            color_out = 'orange'
+        elif number_in == 3:
+            color_out = 'yellow'
+        elif number_in == 4:
+            color_out = 'green'
+        elif number_in == 5:
+            color_out = 'blue'
+        elif number_in == 6:
+            color_out = 'indigo'
+        return color_out
+class Data_about_example():
+    def __init__(self):
+        self.index_id = 1
+        self.data_subject = 'data_about'
+        self.limit_id = 1001
+        self.data_id = 1001
+        self.plot_id = 1001
+        self.series_id = 1001
+        self.data_label = 'dmtool'
+        self.data_reference = 'dmtool'
+        self.data_comment = 'Experiment DMTOOL'
+        self.x_units = 'GeV'
+        self.y_units =  'cm^2'
+        self.x_rescale = '1'
+        self.y_rescale = '1'
+        self.year = '2023'
+        self.spin_dependency = 'SD' # SI
+        self.result_type = 'Th' ## Proj, Exp
+        self.official = 1 ## 0
+        self.open = 1 ## 0
+        self.greatest_hit = 0
+        self.public = '1'
+        self.created_at = '2024-07-08 11:07:00'
+        self.updated_at = '2024-07-08 11:07:00'
+        self.archived_at = '2024-07-08 11:07:00'
+        self.creator_id = 0
+        self.rating = 0
+        self.date_of_announcement = '2024-07-08 11:07:00'
+        self.date_official = '2024-07-08 11:07:00'
+        self.date_of_run_start = '2024-07-08 11:07:00'
+        self.date_of_run_end  = '2024-07-08 11:07:00'
+        self.default_color = 'black' ## 0
+        self.default_style = 'dotted' ## 0
+        self.json = {}
+        self.make_json()
+    def make_json(self):
+        self.json['index_id'] = self.index_id
+        self.json['data_subject'] =  self.data_subject
+        self.json['limit_id'] =  self.limit_id
+        self.json['data_id'] =  self.data_id
+        self.json['plot_id'] =  self.plot_id
+        self.json['series_id'] =  self.series_id
+        self.json['data_label'] =  self.data_label 
+        self.json['data_reference'] =  self.data_reference
+        self.json['data_comment'] =  self.data_comment
+        self.json['x_units'] =  self.x_units
+        self.json['y_units'] =  self.y_units
+        self.json['x_rescale'] =  self.x_rescale
+        self.json['y_rescale'] =  self.y_rescale
+        self.json['year'] =  self.year
+        self.json['spin_dependency'] =  self.spin_dependency
+        self.json['result_type'] =  self.result_type
+        self.json['official'] =  self.official
+        self.json['open'] =  self.open
+        self.json['greatest_hit'] =  self.greatest_hit
+        self.json['public'] =  self.public
+        self.json['created_at'] =  self.created_at
+        self.json['updated_at'] =  self.updated_at
+        self.json['archived_at'] =  self.archived_at
+        self.json['creator_id'] =  self.creator_id 
+        self.json['rating'] =  self.rating
+        self.json['date_of_announcement'] =  self.date_of_announcement
+        self.json['date_official'] =  self.date_official
+        self.json['date_of_run_start'] =  self.date_of_run_start
+        self.json['date_of_run_end'] =  self.date_of_run_end 
+        self.json['default_color'] =  self.default_color
+        self.json['default_style'] =  self.default_style

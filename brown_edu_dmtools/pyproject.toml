@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "brown_edu_dmtools"
+version = "0.0.7"
+authors = [
+  { name="Andrew Gaitskell", email="andrew_gaitskell@brown.edu" },
+]
+description = "brown_edu_dmtools primer"
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "numpy>=1.18.0",
+    "requests>=2.22.0",
+    "pandas>=1.0.0",
+    "certifi",
+    "plotly"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/BrownParticleAstro/dmtools"
+"Bug Tracker" = "https://github.com/BrownParticleAstro/dmtools/issues"
+
