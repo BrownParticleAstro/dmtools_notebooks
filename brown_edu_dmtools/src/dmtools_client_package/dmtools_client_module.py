@@ -104,10 +104,10 @@ class DMToolsClient():
             else:
                 raise
     
-    def update_current(self, data_in,url_in):
+    def update_current(self,data_id_in,data_in,url_in):
         if url_in == '':
             encoded_data = data_in.encode('utf-8')
-            update_url = self.api_server + self.data_api + "update_a_data/?id_in=" + str(1)
+            update_url = self.api_server + self.data_api + "update_a_data/?id_in=" + str(data_id_in)
             update_request = urllib.request.Request(update_url, data=encoded_data, method='PATCH')
             update_request.add_header('dmtool-userid', str(self.dmtool_userid))
             update_request.add_header('dmtool-apikey', self.dmtool_apikey)
@@ -129,15 +129,15 @@ class DMToolsClient():
         except urllib.error.HTTPError as e:
             if e.code == 307:
                 redirect_url = e.headers['Location']
-                return self.update_current(data_in, redirect_url)
+                return self.update_current(data_id_in,data_in, redirect_url)
             elif e.code == 422:
                 print("HTTP 422 Unprocessable Entity")
                 error_response = e.read().decode('utf-8')
-                print("Response content:", error_response)
+                return "Response content:", error_response
             else:
                 print(f"Error: {e.code}")
                 error_response = e.read().decode('utf-8')
-                print("Response content:", error_response)
+                return "Response content:", error_response
     
     def delete_current(self,data_in,url_in):
         if url_in == '':
@@ -246,9 +246,8 @@ class DMToolsClient():
         }
         
         json_data = json.dumps(payload)
-        #print(json_data)
-        r = self.update_current(json_data,'')
-        #print(r)
+        print(json_data)
+        r = self.update_current(data_id_in, json_data,'')
     
     '''
     def get_data_for_plot(self, plot_id_in):
