@@ -115,8 +115,8 @@ class DMToolsClient():
         else:
             encoded_data = data_in.encode('utf-8')
             update_request = urllib.request.Request(url_in, data=encoded_data, method='PATCH')
-            update_request.add_header('dmtool-userid', str(self.dmtools_userid))
-            update_request.add_header('dmtool-apikey', self.dmtools_apikey)
+            update_request.add_header('dmtool-userid', str(self.dmtool_userid))
+            update_request.add_header('dmtool-apikey', self.dmtool_apikey)
             update_request.add_header('Content-Type', 'application/json')
             #create_request.add_header('Content-Type', 'application/x-www-form-urlencoded')
         
