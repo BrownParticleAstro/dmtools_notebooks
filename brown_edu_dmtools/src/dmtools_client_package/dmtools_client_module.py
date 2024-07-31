@@ -311,15 +311,14 @@ class DMToolsClient():
         self.data_display_df['row_id'] = self.data_display_df.index
         self.data_display_df['updated_at'] = pd.to_datetime(self.data_display_df['updated_at'], errors='coerce')
         self.data_display_df['updated_at'] = self.data_display_df['updated_at'].dt.strftime('%Y%m%d%H%M')
-        for index, row in data_display_df.iterrows():
+        for index, row in self.data_display_df.iterrows():
             #print(row['c1'], row['c2']
             #print('data id from data >>>>', row['data_id'])
-            read_a_data_url = self.api_server + self.api_server + "read_a_data/?id_in="+ str(row['data_id'])
+            read_a_data_url = self.api_server + self.data_api + "read_a_data/?id_in="+ str(row['data_id'])
             current_request = Request(read_a_data_url, headers=self.request_header)
             r = urllib.request.urlopen(current_request, context=self.context)
             string = r.read().decode('utf-8')
             a_data_json_obj = json.loads(string)
-            data_display_df = pd.DataFrame(data_json_obj)
             data_label = a_data_json_obj['data_label']
             data_string = a_data_json_obj['data']
             # Convert the string back to a list of lists of lists
