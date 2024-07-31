@@ -427,6 +427,7 @@ class DMToolsClient():
             trace_style = data_display_selected_df['style'].iloc[0]
             trace_color = data_display_selected_df['color'].iloc[0]
             pt = PlotTrace()
+            print("trace_color, trace_style >>>>>>>>>>>" , trace_color, trace_style)
             pt.set_values(trace_color, trace_style)
             for index, row in self.trace_list.iterrows():
                 #print(row)
