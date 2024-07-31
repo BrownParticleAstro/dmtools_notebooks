@@ -375,6 +375,7 @@ class DMToolsClient():
         string = r.read().decode('utf-8')
         data_display_json_obj = json.loads(string)
         self.plot_name = data_display_json_obj['name']
+        self.plot_old_id = data_display_json_obj['old_id']
         
         plot_square_dimensions = 600
 
