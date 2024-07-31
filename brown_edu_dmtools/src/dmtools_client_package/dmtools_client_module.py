@@ -362,10 +362,10 @@ class DMToolsClient():
         self.trace_list = trace_list_refs.drop_duplicates()
 
         #data_data_df.head(5)
-        self.min_cross_sections = self.data_data_df['cross_sections'].min()
-        self.max_cross_sections = self.data_data_df['cross_sections'].max()
-        self.min_masses = self.data_data_df['masses'].min()
-        self.max_masses = self.data_data_df['masses'].max()
+        self.plot_min_cross_sections = self.data_data_df['cross_sections'].min()
+        self.plot_max_cross_sections = self.data_data_df['cross_sections'].max()
+        self.plot_min_masses = self.data_data_df['masses'].min()
+        self.plot_max_masses = self.data_data_df['masses'].max()
 
     
     def create_plot(self):
@@ -405,7 +405,7 @@ class DMToolsClient():
         self.plot_title = self.plot_name + " - P: " + str(self.plot_id) + " - O: " + str(self.plot_old_id)
 
         self.fig_chart_populated.update_layout(
-            title=dict(text=plot_title ,font=dict(size=16),automargin=True,yref='paper')
+            title=dict(text=self.plot_title ,font=dict(size=16),automargin=True,yref='paper')
         )
 
         self.fig_chart_populated.update_layout(hw)
