@@ -302,7 +302,7 @@ class DMToolsClient():
     def get_data_for_plot(self, plot_id_in):
         self.data_df = pd.DataFrame()
         self.data_data_df = pd.DataFrame()
-        read_by_plot_data_display_url = self.api_server + self.api_server + "read_by_plot_data_display/?id_in="+ str(0)
+        read_by_plot_data_display_url = self.api_server + self.data_api + "read_by_plot_data_display/?id_in="+ str(0)
         current_request = Request(read_by_plot_data_display_url, headers=self.request_header)
         r = urllib.request.urlopen(current_request, context=self.context)
         string = r.read().decode('utf-8')
