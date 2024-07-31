@@ -249,37 +249,101 @@ class DMToolsClient():
         print(json_data)
         r = self.update_current(data_id_in, json_data,'')
     
-    '''
+
+    def initialise_plot(self):
+        #self.this_plot = all_plots_df_in[all_plots_df_in['id']==plot_id_in]
+        read_a_plot_url = self.api_server + self.api_server + "read_a_plot/?id_in="+ str(0)
+        current_request = Request(read_a_plot_url, headers=self.request_header)
+        r = urllib.request.urlopen(current_request, context=self.context)
+        string = r.read().decode('utf-8')
+        data_json_obj = json.loads(string)
+        self.plot_df = pd.DataFrame(data_json_obj)
+        self.plot_df['row_id'] = self.plot_df.index
+        self.plot_df['updated_at'] = pd.to_datetime(self.v['updated_at'], errors='coerce')
+        self.plot_df['updated_at'] = self.plot_df['updated_at'].dt.strftime('%Y%m%d%H%M')
+        self.plot_start_x_range = float(self.plot_df.iloc[0]['x_min'])
+        self.plot_stop_x_range = float(self.plot_df.iloc[0]['x_max'])
+        self.plot_start_y_range = float(self.plot_df.iloc[0]['y_min'])
+        self.plot_stop_y_range = float(self.plot_df.iloc[0]['y_max'])
+        self.plot_name = self.plot_df.iloc[0]['name']
+        self.plot_old_id = self.plot_df.iloc[0]['old_id']
+        self.plot_fig_chart_empty = go.Figure(data=[go.Scatter(x=[], y=[])])
+        self.make_blank_chart()
+        
+    ## need this for the inital build of the dash layout
+    def make_blank_chart(self):
+        y_title_text = r"$\text{WIMP Mass [GeV}/c^{2}]$"
+        x_title_text = r"$\text{Cross Section [cm}^{2}\text{] (normalized to nucleon)}$"
+        plot_title = 'Blank Chart'
+        #plot_title
+        ## create empty chart
+        self.plot_fig_chart_empty = go.Figure(data=[go.Scatter(x=[], y=[])])
+        self.plot_fig_chart_empty.update_layout( autosize=False, width=800, height=800, )
+        self.plot_fig_chart_empty.update_layout(xaxis_range=[-1,-4])
+        self.plot_fig_chart_empty.update_layout(yaxis_range=[-1,-4])
+        self.plot_fig_chart_empty.update_layout(
+                margin=dict(l=0, r=0, t=20, b=0),
+                paper_bgcolor="LightSteelBlue",)
+    
+        self.plot_fig_chart_empty.update_layout(
+            title=dict(text=plot_title , font=dict(size=18), automargin=True, yref='paper')
+        )
+        self.plot_fig_chart_empty.update_xaxes(
+            #title_text=x_title_text,
+            #type="log"
+            type="linear"
+        )
+        self.plot_fig_chart_empty.update_yaxes(
+            #title_text=y_title_text,
+            type="log"
+            #type="linear"
+        )
+    
     def get_data_for_plot(self, plot_id_in):
-        data_display_df = get_data_displays_for_plot(plot_id_in)
-        data_df_ret = pd.DataFrame()
-        data_data_df_ret = pd.DataFrame()
+        self.data_df = pd.DataFrame()
+        self.data_data_df = pd.DataFrame()
+        read_by_plot_data_display_url = self.api_server + self.api_server + "read_by_plot_data_display/?id_in="+ str(0)
+        current_request = Request(read_by_plot_data_display_url, headers=self.request_header)
+        r = urllib.request.urlopen(current_request, context=self.context)
+        string = r.read().decode('utf-8')
+        data_display_json_obj = json.loads(string)
+        self.data_display_df = pd.DataFrame(data_display_json_obj)
+        self.data_display_df['row_id'] = self.data_display_df.index
+        self.data_display_df['updated_at'] = pd.to_datetime(self.data_display_df['updated_at'], errors='coerce')
+        self.data_display_df['updated_at'] = self.data_display_df['updated_at'].dt.strftime('%Y%m%d%H%M')
         for index, row in data_display_df.iterrows():
             #print(row['c1'], row['c2']
             #print('data id from data >>>>', row['data_id'])
-            fastapi_url_data = api_server + data_api + "read_a_data/?id_in="+str(row['data_id'])
-            request = Request(fastapi_url_data, headers=request_header)
-            r = urllib.request.urlopen(request, context=context)
+            read_a_data_url = self.api_server + self.api_server + "read_a_data/?id_in="+ str(row['data_id'])
+            current_request = Request(read_a_data_url, headers=self.request_header)
+            r = urllib.request.urlopen(current_request, context=self.context)
             string = r.read().decode('utf-8')
             a_data_json_obj = json.loads(string)
-            #print(a_data_json_obj)
-            #a_data_df = pd.DataFrame(a_data_json_obj, index=[0])
+            data_display_df = pd.DataFrame(data_json_obj)
             data_label = a_data_json_obj['data_label']
             data_string = a_data_json_obj['data']
-            #print(data_string)
-            string_csv = StringIO(data_string)
-            data_data_resp_df = pd.read_csv(string_csv,sep=",", lineterminator="|")
-            data_data_resp_df['data_id'] = row['data_id']
-    
+            # Convert the string back to a list of lists of lists
+            reconstructed_list = json.loads(data_string)
+            #print("Deserialized list:", reconstructed_list)
+            
+            # Flatten the list and add a reference to the top-level list
+            flattened_data = []
+            for i, sublist in enumerate(reconstructed_list):
+                for inner_list in sublist:
+                    flattened_data.append([i+1] + inner_list)
+            
+            # Create a DataFrame from the flattened list
+            columns = ['trace_id', 'x', 'y']
+            data_data_resp_df = pd.DataFrame(flattened_data, columns=columns)
+
             data_df_resp = pd.DataFrame(data=a_data_json_obj, index=[0])
-            #a_data_json_obj
-            #print(a_data_json_obj)
+
             try:
-                y_rescale = float(data_df_resp['y_rescale'].iloc[0])
+                y_rescale = float(a_data_json_obj['y_rescale'])
             except:
                 y_rescale = 1
             try:
-                x_rescale = float(data_df_resp['x_rescale'].iloc[0])
+                x_rescale = float(a_data_json_obj['x_rescale'])
             except:
                 x_rescale = 1
             
@@ -287,46 +351,208 @@ class DMToolsClient():
             data_data_resp_df['cross_sections'] = data_data_resp_df['y'].astype(float).apply(lambda y: y * y_rescale)
             data_data_resp_df['masses'] = data_data_resp_df['x'].astype(float).apply(lambda x: x * x_rescale)
             data_data_resp_df['trace_name'] = data_label
-    
-            data_data_df_ret = pd.concat([data_data_df_ret,data_data_resp_df])
-            data_df_ret = pd.concat([data_df_ret,data_df_resp])
-    
-        return data_df_ret , data_data_df_ret
-        '''
+            data_data_resp_df['data_id'] = row['data_id']
 
-class Plot():
-    def __init__(self):
-        self.fig_chart_empty = go.Figure(data=[go.Scatter(x=[], y=[])])
-        self.make_blank_chart('plot',0,0)
-        
-    ## need this for the inital build of the dash layout
-    def make_blank_chart(self, plot_name_in, plot_id_in, old_plot_id_in):
-        y_title_text = r"$\text{WIMP Mass [GeV}/c^{2}]$"
-        x_title_text = r"$\text{Cross Section [cm}^{2}\text{] (normalized to nucleon)}$"
-        plot_title = plot_name_in + " - Plot Reference:" + str(plot_id_in) + " - Old Plot ID:" + str(old_plot_id_in)
-        #plot_title
-        ## create empty chart
-        self.fig_chart_empty = go.Figure(data=[go.Scatter(x=[], y=[])])
-        self.fig_chart_empty.update_layout( autosize=False, width=800, height=800, )
-        self.fig_chart_empty.update_layout(xaxis_range=[-1,-4])
-        self.fig_chart_empty.update_layout(yaxis_range=[-1,-4])
-        self.fig_chart_empty.update_layout(
-                margin=dict(l=0, r=0, t=20, b=0),
-                paper_bgcolor="LightSteelBlue",)
+            self.data_data_df = pd.concat([self.data_data_df,data_data_resp_df])
+            self.data_df = pd.concat([self.data_df,data_df_resp])
+
+        #trace_list = data_data_df[['data_id','trace_id']].drop_duplicate()
+        trace_list_refs = self.data_data_df[['data_id','trace_id','trace_name']].copy()
+        self.trace_list = trace_list_refs.drop_duplicates()
+
+        #data_data_df.head(5)
+        self.min_cross_sections = self.data_data_df['cross_sections'].min()
+        self.max_cross_sections = self.data_data_df['cross_sections'].max()
+        self.min_masses = self.data_data_df['masses'].min()
+        self.max_masses = self.data_data_df['masses'].max()
+
     
-        self.fig_chart_empty.update_layout(
-            title=dict(text=plot_title , font=dict(size=18), automargin=True, yref='paper')
+    def create_plot(self):
+        
+        plot_square_dimensions = 600
+
+        m1 = go.layout.Margin(l=20,r=10,b=20,t=20,pad=0)
+        hw = go.Layout(autosize=False,width=plot_square_dimensions,height=plot_square_dimensions)
+        y_title_text = r"$\text{Cross Section [cm}^{2}\text{] (normalized to nucleon)}$"
+
+        y1 = go.layout.YAxis(#title=y_title_text,
+                            title_standoff = 0,
+                            #range=[start_y_range,stop_y_range],
+                            type="log",
+                            titlefont=go.layout.yaxis.title.Font(color='SteelBlue'))
+
+        x_title_text = r"$\text{WIMP Mass [GeV}/c^{2}]$"
+        x1 = go.layout.XAxis(#title=x_title_text,
+                            title_standoff = 0,
+                            type="log",
+                            #type="linear",
+                            #range=[start_x_range,stop_x_range],
+                            titlefont=go.layout.xaxis.title.Font(color='SteelBlue'))
+
+
+        ##title1=go.layout.Title(text="Dark Matter Detection Results")
+
+        self.fig_chart_populated = go.Figure(
+            data=[go.Scatter(x=[], y=[])],
+            layout=go.Layout(
+                margin=m1,
+                yaxis= y1,
+                xaxis= x1
+            )
         )
-        self.fig_chart_empty.update_xaxes(
-            #title_text=x_title_text,
-            #type="log"
-            type="linear"
+
+        self.plot_title = self.plot_name + " - P: " + str(self.plot_id) + " - O: " + str(self.plot_old_id)
+
+        self.fig_chart_populated.update_layout(
+            title=dict(text=plot_title ,font=dict(size=16),automargin=True,yref='paper')
         )
-        self.fig_chart_empty.update_yaxes(
-            #title_text=y_title_text,
-            type="log"
-            #type="linear"
-        )
+
+        self.fig_chart_populated.update_layout(hw)
+
+        for index, row in self.data_display_df.iterrows():
+            #print(row['limit_id'])
+            data_id_selected = row['data_id']
+            #print('selected data_id >>', data_id_selected)
+            #data_about_selected_df = self.data_about_df[self.data_about_df['data_id']==data_id_selected].copy()
+            data_display_selected_df = self.data_display_df[self.data_display_df['data_id']==data_id_selected].copy()
+            #data_data_selected_df = self.data_data_df[self.data_data_df['data_id']==data_id_selected].copy()
+            trace_style = data_display_selected_df['style'].iloc[0]
+            trace_color = data_display_selected_df['color'].iloc[0]
+            pt = PlotTrace()
+            pt.set_values(trace_color, trace_style)
+            for index, row in self.trace_list.iterrows():
+                #print(row)
+                trace_data = self.data_data_df[(self.data_data_df['data_id']==row['data_id']) & (self.data_data_df['trace_id']==row['trace_id'])]
+                #print(trace_data)
+                #print("trace_data >>>>" , trace_data)
+                trace_name = row['trace_name']
+                self.fig_chart_populated.add_trace(go.Scatter(pt.__dict__,
+                                                x=trace_data['masses'],
+                                                y=trace_data['cross_sections'],
+                                                name=trace_name,
+                                                        showlegend=False
+                                                    ))
+    def create_populated_legend(self):
+        rows_list = list(range(1,20))
+        cols_list = list(range(1,4))
+
+        table_rows=20
+        table_cols=3
+        #plot_square_dimensions = screen_height_in / 2
+        legend_width = 600 ## this will be a maximum and will shrink if screen size < 800
+        legend_height = 20 * 16
+        self.fig_chart_legend = make_subplots(
+                        column_titles = ['data_id','format'],
+                        rows=table_rows,
+                        cols=table_cols,
+                        horizontal_spacing = 0.00,
+                        vertical_spacing = 0.00,
+                        #subplot_titles=(titles)
+                        column_widths=[0.1,0.8,0.1])
+
+        self.fig_chart_legend.update_layout(
+            #    autosize=False,
+                width=legend_width,
+                height=legend_height,
+                margin=dict(
+                    l=0,
+                    r=0,
+                    b=0,
+                    t=0,
+                    pad=0
+                ),
+                paper_bgcolor="LightSteelBlue",
+            )
+
+        self.fig_chart_legend.update_xaxes(showgrid=False)
+        self.fig_chart_legend.update_yaxes(showgrid=False)
+        #legend
+        self.fig_chart_legend.update_layout(showlegend=False)
+        #x axis
+        self.fig_chart_legend.update_xaxes(visible=False)
+        #y axis
+        self.fig_chart_legend.update_yaxes(visible=False)
+
+        self.fig_chart_legend.data = []
+        #fig_legend_out.show()
+
+        # Any changes to the fig must be applied to the DataFrame as the dataframe
+        # will be used when the plot is saved.
+        # Saving zoom is still to be implemented
+
+        #print("CD : data_display_df>>>>>>>>>", data_display_df_in)
+
+        self.display_legend_df = self.data_display_df[['data_id','color','style']].copy()
+        self.display_legend_df.drop_duplicates(inplace=True)
+
+        rowloop = 1
+        for index, row in self.display_legend_df.iterrows():
+            data_selected_df = self.data_df[self.data_df['id']==row['data_id']].copy()
+            trace_name = data_selected_df['data_label'].iloc[0]
+            for c in cols_list: #enumerate here to get access to i
+                # STEP 2, notice position of arguments!
+                #table_column_names = ['data_id','data_label','format']
+                scatter_mode_list = ['text-number','text-text','format']
+                table_column_names = ['data_id','trace_name','format']
+                trace_style = row['style']
+                trace_color = row['color']
+                data_id = row['data_id']
+                pt = PlotTrace()
+                pt.set_values(trace_color, trace_style)
+                #tc.set_row_col(rowloop, c)
+                #scatter_mode_list = ['text-number','text-text','format']
+                #current_column = table_column_names[c-1]
+                #current_mode = scatter_mode_list[c-1]
+                current_column = table_column_names[c-1]
+                current_mode = scatter_mode_list[c-1]
+                #print(rowloop,current_column, current_mode )
+                if current_mode =='format':
+                    mode = pt.__dict__['mode']
+                    #fill = 'toself'
+                    fill = pt.__dict__['fill']
+                    if mode == 'lines' and fill == 'none':
+                        x_data = [0,1]
+                        y_data = [0.5,0.5]
+                    elif mode == 'lines' and fill == 'toself':
+                        x_data = [0,1,1,0,0]
+                        y_data = [0,0,1,1,0]
+                    else:
+                        x_data = [0,1]
+                        y_data = [0.5,0.5]
+
+                    self.fig_chart_legend.add_trace(go.Scatter(pt.__dict__,x=x_data,
+                                                y=y_data),
+                                row=rowloop, #index for the subplot, i+1 because plotly starts with 1
+                                col=c)
+
+                if current_mode =='text-number':
+                    self.fig_chart_legend.add_trace(go.Scatter(x=[1,2],
+                                            textposition='middle right',
+                                            y=[1,1],
+                                            mode='text',
+                                            text=[str(data_id),'']
+                                            ),
+                                row=rowloop, #index for the subplot, i+1 because plotly starts with 1
+                                col=c)
+                if current_mode =='text-text':
+                    self.fig_chart_legend.add_trace(go.Scatter(x=[1,2],
+                                            textposition='middle right',
+                                            y=[1,1],
+                                            mode='text',
+                                            text=[trace_name,'']
+                                            ),
+                                row=rowloop, #index for the subplot, i+1 because plotly starts with 1
+                                col=c)
+
+            rowloop=rowloop+1
+            self.fig_chart_legend.update_xaxes(showgrid=False)
+            self.fig_chart_legend.update_yaxes(showgrid=False)
+            #legend
+            self.fig_chart_legend.update_layout(showlegend=False)
+            #x axis
+            self.fig_chart_legend.update_xaxes(visible=False)
+            #y axis
+            self.fig_chart_legend.update_yaxes(visible=False)
         
 
 class PlotTrace():
