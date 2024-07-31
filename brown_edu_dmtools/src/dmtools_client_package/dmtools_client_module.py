@@ -315,6 +315,7 @@ class DMToolsClient():
             #print(row['c1'], row['c2']
             #print('data id from data >>>>', row['data_id'])
             read_a_data_url = self.api_server + self.data_api + "read_a_data/?id_in="+ str(row['data_id'])
+            print("read_a_data_url >>>>>>>>>>>>>" , read_a_data_url)
             current_request = Request(read_a_data_url, headers=self.request_header)
             r = urllib.request.urlopen(current_request, context=self.context)
             string = r.read().decode('utf-8')
