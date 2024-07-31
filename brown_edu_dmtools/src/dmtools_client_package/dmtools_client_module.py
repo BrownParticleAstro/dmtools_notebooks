@@ -84,14 +84,10 @@ class DMToolsClient():
 
         # Create the request object
         req = urllib.request.Request(self.current_url, data=json_data, headers={'Content-Type': 'application/json'}, method='POST')
-        
-        with urllib.request.urlopen(req, context=self.context) as response:
-                response_data = response.read().decode('utf-8')
-                return response.status, response_data
-        '''
+                
         try:
             # Send the request and get the response
-            with urllib.request.urlopen(req) as response:
+            with urllib.request.urlopen(req, context=self.context) as response:
                 response_data = response.read().decode('utf-8')
                 return response.status, response_data
         except urllib.error.HTTPError as e:
@@ -105,7 +101,7 @@ class DMToolsClient():
                 return e.code, f"HTTP Error {e.code}: {e.reason}\nError message: {error_message}"
         except urllib.error.URLError as e:
             return None, f"URL Error: {e.reason}"
-        '''
+    
 
     '''
     def create_current(self,data_in,url_in): ## leave url in as needed for not found error
