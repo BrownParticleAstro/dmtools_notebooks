@@ -85,7 +85,7 @@ class DMToolsClient():
         # Create the request object
         req = urllib.request.Request(self.current_url, data=json_data, headers={'Content-Type': 'application/json'}, method='POST')
         
-        with urllib.request.urlopen(req) as response:
+        with urllib.request.urlopen(req, context=self.context) as response:
                 response_data = response.read().decode('utf-8')
                 return response.status, response_data
         '''
