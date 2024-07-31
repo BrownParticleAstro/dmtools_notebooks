@@ -431,10 +431,12 @@ class DMToolsClient():
             pt.set_values(trace_color, trace_style)
             for index, row in self.trace_list.iterrows():
                 #print(row)
-                trace_data = self.data_data_df[(self.data_data_df['data_id']==row['data_id']) & (self.data_data_df['trace_id']==row['trace_id'])]
+                trace_data = self.data_data_df[(self.data_data_df['data_id']==\
+                                                row['data_id']) & (self.data_data_df['trace_id']==row['trace_id'])]
                 #print(trace_data)
                 #print("trace_data >>>>" , trace_data)
                 trace_name = row['trace_name']
+                print("trace_name, pt.__dict__ >>>>", trace_name, pt.__dict__)
                 self.fig_chart_populated.add_trace(go.Scatter(pt.__dict__,
                                                 x=trace_data['masses'],
                                                 y=trace_data['cross_sections'],
