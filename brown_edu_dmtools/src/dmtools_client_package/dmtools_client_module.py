@@ -252,7 +252,7 @@ class DMToolsClient():
 
     def initialise_plot(self):
         #self.this_plot = all_plots_df_in[all_plots_df_in['id']==plot_id_in]
-        read_a_plot_url = self.api_server + self.api_server + "read_a_plot/?id_in="+ str(0)
+        read_a_plot_url = self.api_server + self.data_api + "read_a_plot/?id_in="+ str(0)
         current_request = Request(read_a_plot_url, headers=self.request_header)
         r = urllib.request.urlopen(current_request, context=self.context)
         string = r.read().decode('utf-8')
