@@ -81,15 +81,15 @@ class DMToolsClient():
     def create_current(self,data_in,url_in): ## leave url in as needed for not found error
         if url_in == '':
             #encoded_data = data_in.encode('utf-8')
-            json_data = json.dumps(data_in)
-            create_request = urllib.request.Request(self.current_url, data=json_data, method='POST')
+            json_data_as_bytes = json.dumps(data_in).encode('utf-8')
+            create_request = urllib.request.Request(self.current_url, data=json_data_as_bytes, method='POST')
             create_request.add_header('dmtool-userid', str(self.dmtool_userid))
             create_request.add_header('dmtool-apikey', self.dmtool_apikey)
             create_request.add_header('Content-Type', 'application/x-www-form-urlencoded')
         else:
             #encoded_data = data_in.encode('utf-8')
-            json_data = json.dumps(data_in)
-            create_request = urllib.request.Request(url_in, data=json_data, method='POST')
+            json_data_as_bytes = json.dumps(data_in).encode('utf-8')
+            create_request = urllib.request.Request(url_in, data=json_data_as_bytes, method='POST')
             create_request.add_header('dmtool-userid', str(self.dmtool_userid))
             create_request.add_header('dmtool-apikey', self.dmtool_apikey)
             create_request.add_header('Content-Type', 'application/x-www-form-urlencoded')
