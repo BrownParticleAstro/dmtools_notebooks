@@ -77,7 +77,7 @@ class DMToolsClient():
         self.current_df['updated_at'] = pd.to_datetime(self.current_df['updated_at'], errors='coerce')
         self.current_df['updated_at'] = self.current_df['updated_at'].dt.strftime('%Y%m%d%H%M')
         return self.current_df
-
+    '''
     def create_current(self,data_in,url_in):
 
         json_data = json.dumps(data_in).encode('utf-8')
@@ -95,15 +95,15 @@ class DMToolsClient():
                 # Handle redirect manually
                 redirect_url = e.headers['Location']
                 print(f"Redirected to: {redirect_url}")
-                return self.create_current(redirect_url, json_data)
+                return self.create_current(json_data, redirect_url)
             else:
                 error_message = e.read().decode('utf-8')
                 return e.code, f"HTTP Error {e.code}: {e.reason}\nError message: {error_message}"
         except urllib.error.URLError as e:
             return None, f"URL Error: {e.reason}"
-    
-
     '''
+    ## cannot work out why this is not working
+    ## is is same as the update, but it is a POST method??
     def create_current(self,data_in,url_in): ## leave url in as needed for not found error
         if url_in == '':
             #encoded_data = data_in.encode('utf-8')
@@ -133,7 +133,7 @@ class DMToolsClient():
                 return self.create_current(data_in, redirect_url)
             else:
                 raise
-    '''
+                
     def update_current(self,data_id_in,data_in,url_in):
         if url_in == '':
             encoded_data = data_in.encode('utf-8')
@@ -152,7 +152,7 @@ class DMToolsClient():
             #create_request.add_header('Content-Type', 'application/x-www-form-urlencoded')
         
         try:
-            with urllib.request.urlopen(update_request, context=context) as response:
+            with urllib.request.urlopen(update_request, context=self.context) as response:
                 response_data = response.read().decode('utf-8')
                 response_json_obj = json.loads(response_data)
                 return response_json_obj
