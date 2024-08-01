@@ -112,7 +112,8 @@ class DMToolsClient():
             create_request = urllib.request.Request(self.current_url, data=encoded_data, method='POST')
             create_request.add_header('dmtool-userid', str(self.dmtool_userid))
             create_request.add_header('dmtool-apikey', self.dmtool_apikey)
-            create_request.add_header('Content-Type', 'application/x-www-form-urlencoded')
+            #create_request.add_header('Content-Type', 'application/x-www-form-urlencoded')
+            create_request.add_header('Content-Type', 'application/json')
         else:
             #encoded_data = data_in.encode('utf-8')
             #encoded_data = urllib.parse.urlencode(data_in).encode('utf-8')
@@ -120,7 +121,8 @@ class DMToolsClient():
             create_request = urllib.request.Request(url_in, data=encoded_data, method='POST')
             create_request.add_header('dmtool-userid', str(self.dmtool_userid))
             create_request.add_header('dmtool-apikey', self.dmtool_apikey)
-            create_request.add_header('Content-Type', 'application/x-www-form-urlencoded')
+            #create_request.add_header('Content-Type', 'application/x-www-form-urlencoded')
+            create_request.add_header('Content-Type', 'application/json')
         
         try:
             with urllib.request.urlopen(create_request, context=self.context) as response:
