@@ -255,13 +255,15 @@ class DMToolsClient():
                 try:
                     x = float(raw_x)
                     y = float(raw_y)
-                    masses =  float(raw_x)
-                    cross_sections = float(raw_y)
+                    #masses =  float(raw_x)
+                    #cross_sections = float(raw_y)
                     formatted_x = "{:.5e}".format(x)
                     formatted_y = "{:.5e}".format(y)
+                    append_x = float(formatted_x)
+                    append_y = float(formatted_y)
                     #append_this = str(trace_id) + "," + formatted_x + "," + formatted_y
                     #append_this = '['+formatted_x+','+formatted_y+'],'
-                    append_this = [formatted_x, formatted_y]
+                    append_this = [append_x, append_y]
                     series_lol = series_lol + [append_this]
                 except:
                     print('rejected z >> ', z)
