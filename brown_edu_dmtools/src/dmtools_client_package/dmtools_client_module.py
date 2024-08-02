@@ -143,17 +143,15 @@ class DMToolsClient():
     
     def delete_current(self,data_id_in,url_in):
         if url_in == '':
-            #update_url = self.api_server + self.data_api + "delete_a_data/?id_in=" + str(data_id_in)
             delete_request = urllib.request.Request(self.current_url, method='DELETE')
             delete_request.add_header('dmtool-userid', str(self.dmtool_userid))
             delete_request.add_header('dmtool-apikey', self.dmtool_apikey)
             delete_request.add_header('Content-Type', 'application/json')
         else:
-            delete_request = urllib.request.Request(url_in, data=encoded_data, method='PATCH')
+            delete_request = urllib.request.Request(url_in, method='DELETE')
             delete_request.add_header('dmtool-userid', str(self.dmtool_userid))
             delete_request.add_header('dmtool-apikey', self.dmtool_apikey)
             delete_request.add_header('Content-Type', 'application/json')
-            #create_request.add_header('Content-Type', 'application/x-www-form-urlencoded')
         
         try:
             with urllib.request.urlopen(delete_request, context=self.context) as response:
