@@ -51,7 +51,9 @@ class DMToolsClient():
             return 1
     
     def create_request_header(self):
-        self.request_header = {'dmtool-userid': self.dmtool_userid ,'dmtool-apikey': self.dmtool_apikey, 'Content-Type': 'application/x-www-form-urlencoded'}
+        self.request_header = {'dmtool-userid': self.dmtool_userid ,\
+                               'dmtool-apikey': self.dmtool_apikey, \
+                                'Content-Type': 'application/x-www-form-urlencoded'}
     
     def create_current_url(self, purpose_in, subject_in, id_in):
         self.current_url = self.api_server + self.data_api + purpose_in + "_" + subject_in
@@ -77,51 +79,19 @@ class DMToolsClient():
         self.current_df['updated_at'] = pd.to_datetime(self.current_df['updated_at'], errors='coerce')
         self.current_df['updated_at'] = self.current_df['updated_at'].dt.strftime('%Y%m%d%H%M')
         return self.current_df
-    '''
-    def create_current(self,data_in,url_in):
-
-        json_data = json.dumps(data_in).encode('utf-8')
-
-        # Create the request object
-        req = urllib.request.Request(self.current_url, data=json_data, headers={'Content-Type': 'application/json'}, method='POST')
-                
-        try:
-            # Send the request and get the response
-            with urllib.request.urlopen(req, context=self.context) as response:
-                response_data = response.read().decode('utf-8')
-                return response.status, response_data
-        except urllib.error.HTTPError as e:
-            if e.code == 307:
-                # Handle redirect manually
-                redirect_url = e.headers['Location']
-                print(f"Redirected to: {redirect_url}")
-                return self.create_current(json_data, redirect_url)
-            else:
-                error_message = e.read().decode('utf-8')
-                return e.code, f"HTTP Error {e.code}: {e.reason}\nError message: {error_message}"
-        except urllib.error.URLError as e:
-            return None, f"URL Error: {e.reason}"
-    '''
-    ## cannot work out why this is not working
-    ## is is same as the update, but it is a POST method??
+    
     def create_current(self,data_in,url_in): ## leave url in as needed for not found error
         if url_in == '':
-            #encoded_data = data_in.encode('utf-8')
-            #encoded_data = urllib.parse.urlencode(data_in).encode('utf-8')
             encoded_data = json.dumps(data_in).encode('utf-8')
             create_request = urllib.request.Request(self.current_url, data=encoded_data, method='POST')
             create_request.add_header('dmtool-userid', str(self.dmtool_userid))
             create_request.add_header('dmtool-apikey', self.dmtool_apikey)
-            #create_request.add_header('Content-Type', 'application/x-www-form-urlencoded')
             create_request.add_header('Content-Type', 'application/json')
         else:
-            #encoded_data = data_in.encode('utf-8')
-            #encoded_data = urllib.parse.urlencode(data_in).encode('utf-8')
             encoded_data = json.dumps(data_in).encode('utf-8')
             create_request = urllib.request.Request(url_in, data=encoded_data, method='POST')
             create_request.add_header('dmtool-userid', str(self.dmtool_userid))
             create_request.add_header('dmtool-apikey', self.dmtool_apikey)
-            #create_request.add_header('Content-Type', 'application/x-www-form-urlencoded')
             create_request.add_header('Content-Type', 'application/json')
         
         try:
@@ -139,8 +109,8 @@ class DMToolsClient():
     def update_current(self,data_id_in,data_in,url_in):
         if url_in == '':
             encoded_data = data_in.encode('utf-8')
-            update_url = self.api_server + self.data_api + "update_a_data/?id_in=" + str(data_id_in)
-            update_request = urllib.request.Request(update_url, data=encoded_data, method='PATCH')
+            #update_url = self.api_server + self.data_api + "update_a_data/?id_in=" + str(data_id_in)
+            update_request = urllib.request.Request(self.current_url, data=encoded_data, method='PATCH')
             update_request.add_header('dmtool-userid', str(self.dmtool_userid))
             update_request.add_header('dmtool-apikey', self.dmtool_apikey)
             #update_request.add_header('Content-Type', 'application/x-www-form-urlencoded')
@@ -171,19 +141,19 @@ class DMToolsClient():
                 error_response = e.read().decode('utf-8')
                 return "Response content:", error_response
     
-    def delete_current(self,data_in,url_in):
+    def delete_current(self,data_id_in,url_in):
         if url_in == '':
-            encoded_data = urllib.parse.urlencode(data_in).encode('utf-8')
-            delete_request = urllib.request.Request(self.current_url, data=encoded_data, method='DELETE')
+            #update_url = self.api_server + self.data_api + "delete_a_data/?id_in=" + str(data_id_in)
+            delete_request = urllib.request.Request(self.current_url, method='DELETE')
             delete_request.add_header('dmtool-userid', str(self.dmtool_userid))
             delete_request.add_header('dmtool-apikey', self.dmtool_apikey)
-            delete_request.add_header('Content-Type', 'application/x-www-form-urlencoded')
+            delete_request.add_header('Content-Type', 'application/json')
         else:
-            encoded_data = urllib.parse.urlencode(data_in).encode('utf-8')
-            delete_request = urllib.request.Request(url_in, data=encoded_data, method='POST')
+            delete_request = urllib.request.Request(url_in, data=encoded_data, method='PATCH')
             delete_request.add_header('dmtool-userid', str(self.dmtool_userid))
             delete_request.add_header('dmtool-apikey', self.dmtool_apikey)
-            delete_request.add_header('Content-Type', 'application/x-www-form-urlencoded')
+            delete_request.add_header('Content-Type', 'application/json')
+            #create_request.add_header('Content-Type', 'application/x-www-form-urlencoded')
         
         try:
             with urllib.request.urlopen(delete_request, context=self.context) as response:
@@ -193,15 +163,47 @@ class DMToolsClient():
         except urllib.error.HTTPError as e:
             if e.code == 307:
                 redirect_url = e.headers['Location']
-                return self.update_current(data_in, redirect_url)
+                return self.delete_current(data_id_in, redirect_url)
             elif e.code == 422:
                 print("HTTP 422 Unprocessable Entity")
                 error_response = e.read().decode('utf-8')
-                print("Response content:", error_response)
+                return "Response content:", error_response
             else:
                 print(f"Error: {e.code}")
                 error_response = e.read().decode('utf-8')
-                print("Response content:", error_response)
+                return "Response content:", error_response
+    
+    def archive_current(self,data_id_in,data_in,url_in):
+        if url_in == '':
+            encoded_data = data_in.encode('utf-8')
+            archive_request = urllib.request.Request(self.current_url, data=encoded_data, method='PATCH')
+            archive_request.add_header('dmtool-userid', str(self.dmtool_userid))
+            archive_request.add_header('dmtool-apikey', self.dmtool_apikey)
+            archive_request.add_header('Content-Type', 'application/json')
+        else:
+            encoded_data = data_in.encode('utf-8')
+            archive_request = urllib.request.Request(url_in, data=encoded_data, method='PATCH')
+            archive_request.add_header('dmtool-userid', str(self.dmtool_userid))
+            archive_request.add_header('dmtool-apikey', self.dmtool_apikey)
+            archive_request.add_header('Content-Type', 'application/json')
+        
+        try:
+            with urllib.request.urlopen(archive_request, context=self.context) as response:
+                response_data = response.read().decode('utf-8')
+                response_json_obj = json.loads(response_data)
+                return response_json_obj
+        except urllib.error.HTTPError as e:
+            if e.code == 307:
+                redirect_url = e.headers['Location']
+                return self.archive_current(data_id_in,data_in, redirect_url)
+            elif e.code == 422:
+                print("HTTP 422 Unprocessable Entity")
+                error_response = e.read().decode('utf-8')
+                return "Response content:", error_response
+            else:
+                print(f"Error: {e.code}")
+                error_response = e.read().decode('utf-8')
+                return "Response content:", error_response
 
     def clean_data_values(self, data_id_in):
         fastapi_url_data = self.api_server + self.data_api + "read_a_data/?id_in=" + str(data_id_in)
