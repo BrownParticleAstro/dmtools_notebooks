@@ -8,7 +8,7 @@ attrs==24.2.0
 babel==2.16.0
 beautifulsoup4==4.12.3
 bleach==6.1.0
-brown_edu_dmtools==0.0.9
+-e git+https://github.com/BrownParticleAstro/dmtools.git@fa1111ce8f178ada027646e14ba8d49711258131#egg=brown_edu_dmtools&subdirectory=basecode/publish_library/brown_edu_dmtools
 certifi==2024.7.4
 cffi==1.17.0
 charset-normalizer==3.3.2
@@ -51,7 +51,7 @@ mistune==3.0.2
 nbclient==0.10.0
 nbconvert==7.16.4
 nbformat==5.10.4
-nest_asyncio==1.6.0
+nest-asyncio==1.6.0
 notebook==7.2.1
 notebook_shim==0.2.4
 numpy==2.0.1
@@ -63,7 +63,7 @@ parso==0.8.4
 pexpect==4.9.0
 platformdirs==4.2.2
 plotly==5.23.0
-prometheus-client==0.20.0
+prometheus_client==0.20.0
 prompt_toolkit==3.0.47
 psutil==6.0.0
 ptyprocess==0.7.0
@@ -84,9 +84,10 @@ rfc3339-validator==0.1.4
 rfc3986-validator==0.1.1
 rpds-py==0.20.0
 Send2Trash==1.8.3
+setuptools==72.2.0
 six==1.16.0
 sniffio==1.3.1
-soupsieve==2.5
+soupsieve==2.6
 stack-data==0.6.3
 tenacity==9.0.0
 terminado==0.18.1
@@ -94,7 +95,6 @@ tinycss2==1.3.0
 tornado==6.4.1
 traitlets==5.14.3
 types-python-dateutil==2.9.0.20240316
-typing_extensions==4.12.2
 tzdata==2024.1
 uri-template==1.3.0
 urllib3==2.2.2
