@@ -8,7 +8,6 @@ attrs==24.2.0
 babel==2.16.0
 beautifulsoup4==4.12.3
 bleach==6.1.0
--e git+https://github.com/BrownParticleAstro/dmtools.git@fa1111ce8f178ada027646e14ba8d49711258131#egg=brown_edu_dmtools&subdirectory=basecode/publish_library/brown_edu_dmtools
 certifi==2024.7.4
 cffi==1.17.0
 charset-normalizer==3.3.2
