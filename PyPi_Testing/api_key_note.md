@@ -1,1 +1,1 @@
-The SPI Key in the Testing Notebook has been deleted.
+The API Key in the Testing Notebook has been deleted.
