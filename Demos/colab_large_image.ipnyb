@@ -1,0 +1,60 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Create and Display a Large Image in Colab"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "metadata": {},
+   "source": [
+    "# Step 1: Create a large image (e.g., 2000x2000 pixels)\n",
+    "import numpy as np\n",
+    "from PIL import Image\n",
+    "\n",
+    "# Create a random RGB image (2000x2000, values 0-255)\n",
+    "array = np.random.randint(0, 256, (2000, 2000, 3), dtype=np.uint8)\n",
+    "img = Image.fromarray(array)\n",
+    "\n",
+    "img.save('/content/large_image.png')\n",
+    "print('Image saved as /content/large_image.png')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "metadata": {},
+   "source": [
+    "# Step 2: Display the image inline in Colab\n",
+    "from IPython.display import Image, display\n",
+    "\n",
+    "display(Image(filename='/content/large_image.png'))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "metadata": {},
+   "source": [
+    "# (Optional) Step 3: Show image size and a thumbnail\n",
+    "print('Image size:', img.size)\n",
+    "img.thumbnail((300, 300))\n",
+    "img.show()  # This will display as a pop-up in some environments, but not in Colab."
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "name": "python",
+   "version": ""
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 0
+}
