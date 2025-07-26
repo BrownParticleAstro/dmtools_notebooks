@@ -1,3 +1,6 @@
+# current plot
+current_plot.json
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
