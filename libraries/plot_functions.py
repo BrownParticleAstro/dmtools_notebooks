@@ -255,3 +255,89 @@ def get_clean_color_style(color_in, style_in):
         clean_trace_style = 'line'
 
     return clean_trace_color, clean_trace_style
+    
+def get_empty_plot():
+    empty_plot = {
+      "dmtools_current_plot": {
+        "plot_node": {
+          "record": {
+            "id": -1,
+            "type": "Plot",
+            "created": "2025-07-26T14:46:37.430Z",
+            "updated": "2025-07-26T14:46:37.430Z"
+          },
+          "properties": {
+            "name": "Default Plot",
+            "xMax": "100",
+            "xMin": "0",
+            "yMax": "100",
+            "yMin": "0",
+            "xUnits": "keV/c^2",
+            "yUnits": "cm^2",
+            "plotType": "Cross Section vs WIMP Mass"
+          }
+        },
+        "display_data": [
+          {
+            "data": [
+              {
+                "record": {
+                  "id": -1,
+                  "type": "Data",
+                  "created": "2025-07-26T14:46:37.430Z",
+                  "updated": "2025-07-26T14:46:37.430Z"
+                },
+                "properties": {
+                  "raw": "[[['0','0'],['0','1'],['1','1'],['1','0'],['0','0']]]",
+                  "open": 0,
+                  "year": 2000,
+                  "label": "label",
+                  "hepUrl": "https://www.hepdata.net/record/show/hepdata.123456",
+                  "public": 0,
+                  "rating": 0,
+                  "values": [
+                    [
+                      ["0", "0"],
+                      ["0", "1"],
+                      ["1", "1"],
+                      ["1", "0"],
+                      ["0", "0"]
+                    ]
+                  ],
+                  "xUnits": "GeV/c^2",
+                  "yUnits": "cm2",
+                  "comment": "comment",
+                  "dateEnd": None,
+                  "official": 0,
+                  "xRescale": "1",
+                  "yRescale": "1",
+                  "dateStart": None,
+                  "reference": "reference",
+                  "experiment": "Experiment",
+                  "resultType": "Th",
+                  "greatestHit": 0,
+                  "label_short": "label",
+                  "dateOfficial": None,
+                  "defaultColor": "black",
+                  "defaultStyle": "line",
+                  "spinDependency": "SD",
+                  "measurementType": "Unknown",
+                  "dateAnnouncement": None
+                }
+              }
+            ],
+            "record": {
+              "id": -1,
+              "type": "Display",
+              "created": "2025-07-26T14:46:37.430Z",
+              "updated": "2025-07-26T14:46:37.430Z"
+            },
+            "properties": {
+              "color": "black",
+              "style": "line"
+            }
+          }
+        ]
+      }
+    }
+    return empty_plot
