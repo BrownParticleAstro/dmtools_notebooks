@@ -255,11 +255,3 @@ def get_clean_color_style(color_in, style_in):
         clean_trace_style = 'line'
 
     return clean_trace_color, clean_trace_style
-
-
-
-
-
-        print("status_code >>>", status_code)
-        print("data >>>", data_nodes[0].get('properties'))
-    return jsonify({"message": "Display Data updated successfully"})
