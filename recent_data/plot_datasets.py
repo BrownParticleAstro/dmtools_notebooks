@@ -1,5 +1,5 @@
 
-def r_51():
+def r_51_data():
    return_var = [{'properties': {'comment': 'Sigma normalized to WIMP-Nucleon, no background subtraction',
    'dateAnnouncement': '1999-01-01',
    'dateEnd': None,
