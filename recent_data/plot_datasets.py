@@ -1,5 +1,6 @@
 
-r_51 = [{'properties': {'comment': 'Sigma normalized to WIMP-Nucleon, no background subtraction',
+def r_51():
+   return_var = [{'properties': {'comment': 'Sigma normalized to WIMP-Nucleon, no background subtraction',
    'dateAnnouncement': '1999-01-01',
    'dateEnd': None,
    'dateOfficial': None,
@@ -59,3 +60,5 @@ r_51 = [{'properties': {'comment': 'Sigma normalized to WIMP-Nucleon, no backgro
    'id': 51,
    'type': 'Data',
    'updated': 'Tue, 21 Jan 2025 14:22:36 GMT'}}]
+
+   return return_var
